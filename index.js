@@ -106,7 +106,7 @@
 //new code for new  projects........
 
 require("dotenv").config();
-console.log(process.env.MONGO_URL);
+console.log(process.env.MONGO_URI);
 console.log(process.env.SESSION_SECRET);
 console.log(process.env.PORT);
 
@@ -181,7 +181,7 @@ main()
 
 async function main() {
     // await mongoose.connect('mongodb://127.0.0.1:27017/whatsapp');
-    await mongoose.connect(process.env.MONGO_URL);
+    await mongoose.connect(process.env.MONGO_URI);
 }
 
 //Index Route
