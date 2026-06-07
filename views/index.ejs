@@ -1,0 +1,82 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Whatsapp</title>
+    <link rel = "stylesheet" href = "style.css" />
+</head>
+<body>
+
+    <h3>All Chats!</h3>
+    <form method="GET" action="/Chats/new">
+        <button>New Chat</button>
+    </form>
+    <br />
+    <% for(let Chat of Chats) { %>
+    <div class="chat">
+        <p>from : <i> <%= Chat.from %> </i></p>
+        <div class="msg">
+            <p> <%= Chat.msg %> </p>
+            <form method="GET" action="/Chats/<%= Chat._id %>/edit">
+                <button>Edit</button>
+            </form>
+            <br />
+            <form method="POST" action="/Chats/<%= Chat._id %>?_method=DELETE" onsubmit="return confirm('Do you really want to delete this chat?')">
+                <button>delete</button>
+            </form>
+        </div>
+        <p>Received by <i> <%= Chat.to %> </i> </p>
+        <hr />
+        <p> <%= Chat.created_at.toString().split(" ") [4] %> </p>
+        <p><%= Chat.created_at.toString().split(" ").slice(0, 4).join("-") %></p>
+    </div>
+<% } %>
+
+</body>
+</html>
+ -->
+
+
+
+<!-- new code for new projects........ -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Whatsapp</title>
+    <link rel = "stylesheet" href = "style.css" />
+</head>
+<body>
+
+    <h3>All Chats!</h3>
+    <form method="GET" action="/Chats/new">
+        <button>New Chat</button>
+    </form>
+    <br />
+    <% for(let Chat of Chats) { %>
+    <div class="chat">
+        <p>from : <i> <%= Chat.from %> </i></p>
+        <div class="msg">
+            <p> <%= Chat.msg %> </p>
+            <form method="GET" action="/Chats/<%= Chat._id %>/edit">
+                <button>Edit</button>
+            </form>
+            <br />
+            <form method="POST" action="/Chats/<%= Chat._id %>?_method=DELETE" onsubmit="return confirm('Do you really want to delete this chat?')">
+                <button>delete</button>
+            </form>
+        </div>
+        <p>Received by <i> <%= Chat.to %> </i> </p>
+        <hr />
+        <p> <%= Chat.created_at.toString().split(" ") [4] %> </p>
+        <p><%= Chat.created_at.toString().split(" ").slice(0, 4).join("-") %></p>
+    </div>
+<% } %>
+
+</body>
+</html>
+

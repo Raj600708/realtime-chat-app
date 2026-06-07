@@ -1,0 +1,62 @@
+/* body {
+    margin-left: 20px;
+}
+
+.chat {
+    background-color: aliceblue;
+    padding: 20px;
+    border-radius: 16px;
+    display: inline-block;
+    
+}
+
+.msg {
+    background-color: rgb(9, 116, 223);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 16px;
+}
+
+button {
+    border-radius: 8px;
+    padding: 5px 10px;
+    background-color: grey;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    
+
+} */
+
+/* new code for new  projects........ */
+
+
+body {
+    margin-left: 20px;
+}
+
+.chat {
+    background-color: aliceblue;
+    padding: 20px;
+    border-radius: 16px;
+    display: inline-block;
+    
+}
+
+.msg {
+    background-color: rgb(9, 116, 223);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 16px;
+}
+
+button {
+    border-radius: 8px;
+    padding: 5px 10px;
+    background-color: grey;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    
+
+}

@@ -1,0 +1,547 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+</head>
+<body>
+
+<h1>Chat Window</h1>
+
+<% for(let chat of chats){ %>
+    <p>
+        <b><%= chat.from %></b> :
+        <%= chat.msg %>
+    </p>
+<% } %>
+
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+<link rel="stylesheet" href="/2chat.css">
+
+
+
+
+</head>
+<body>
+    <audio id="notifSound" src="/notification.mp3" preload="auto"></audio>
+    <div class="chat-header">
+    <div>💬 Chat — You are: <span style="color:#25d366"><%= currentUser.toUpperCase() %></span></div>
+
+    <a href="/logout">Logout</a>
+
+    <button id="darkModeBtn" type="button" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;">🌙</button>
+
+    <div id="statusBar" style="font-size:13px; margin-top:4px; color:#a8d5a2;">
+    <% if(lastSeen){ %>
+        🕐 Last seen <%= new Date(lastSeen).toLocaleString('en-IN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            day: '2-digit',
+            month: 'short'
+        }) %>
+    <% } else { %>
+        Checking status...
+    <% } %>
+</div>
+</div>
+
+<div class="chat-container" id="chatContainer">
+    
+
+    <% for(let chat of chats){ %>
+        <div class="message-wrapper <%= chat.from === currentUser ? 'mine' : 'theirs' %>"
+            data-id="<%= chat._id %>">
+
+<div class="message" data-id="<%= chat._id %>">
+
+    <div class="sender"><%= chat.from %></div>
+
+    <% if(chat.replyTo){ %>
+    <div class="reply-preview">↩️ <%= chat.replyTo.substring(0, 40) %></div>
+<% } %>
+
+
+    <% if(chat.messageType === "image"){ %>
+
+    <img
+        src="<%= chat.msg %>"
+        alt="image"
+        class="chat-image"
+        style="max-width:200px; border-radius:10px; cursor:pointer;"
+    >
+
+<% } else { %>
+
+
+    <div><%= chat.msg %></div>
+<% } %>
+
+    <% if(chat.from === currentUser){ %>
+
+<form
+class="delete-form"
+action="/Chats/<%= chat._id %>"
+method="POST"
+style="margin-top:5px;"
+>
+
+<button type="submit">
+🗑️
+</button>
+
+</form>
+
+<% } %>
+    <button class="reply-btn" data-msg="<%= chat.msg %>" data-id="<%= chat._id %>">↩️</button>
+
+    <button class="copy-btn" data-msg="<%= chat.msg %>">📋</button>
+    <div class="timestamp">
+        <%= new Date(chat.created_at).toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'}) %>
+        <% if(chat.from === currentUser){ %>
+            <span class="tick <%= chat.isRead ? 'seen' : '' %>" id="tick-<%= chat._id %>">
+                <%= chat.isRead ? '✓✓' : '✓' %>
+            </span>
+        <% } %>
+    </div>
+</div>
+        </div>
+    <% } %>
+
+</div>
+<div class="reply-bar" id="replyBar">
+    <span>↩️ Replying to: </span>
+    <span id="replyPreviewText" style="font-style:italic; color:#075e54;"></span>
+    <span id="cancelReply">✕</span>
+
+    
+
+</div>
+<div class="typing-indicator" id="typingIndicator"></div>
+<div class="form-area">
+
+    <form id="chatForm" style="display:flex;flex:1;gap:8px; align-items:center;">
+    
+    <input type="file" id="imageInput" accept="image/*" style="display:none;">
+    <button type="button" id="imageBtn">📷</button>
+
+    <button type="button" id="emojiBtn">😊</button>
+<div id="emojiPicker" style="display:none; position:absolute; bottom:60px; left:10px; background:white; border:1px solid #ccc; border-radius:10px; padding:8px; z-index:999; width:220px; flex-wrap:wrap; gap:4px;">
+</div>
+
+    <span id="imagePreviewName" style="font-size:12px; color:#075e54; max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
+    <input type="text" id="msg" placeholder="Type a message...">
+    <button type="submit">➤</button>
+
+</form>
+</div>
+
+
+
+<div id="imageModal" class="image-modal">
+    <span id="closeModal">&times;</span>
+    <a id="downloadBtn" download>⬇️</a>
+    <img id="modalImage" src="">
+</div>
+
+
+
+
+<script src="/socket.io/socket.io.js"></script>
+
+
+
+
+
+<script>
+
+const socket = io();
+const currentUser = "<%= currentUser %>";
+const otherUser = currentUser === "raj" ? "anshu" : "raj";
+
+let replyToMsg = null;
+let replyToId = null;
+
+
+const replyBar = document.getElementById("replyBar");
+const replyPreviewText = document.getElementById("replyPreviewText");
+const cancelReply = document.getElementById("cancelReply");
+
+const form = document.getElementById("chatForm");
+const imageInput = document.getElementById("imageInput");
+document.getElementById("imageBtn").addEventListener("click", () => {
+    imageInput.click();
+});
+imageInput.addEventListener("change", () => {
+    const nameSpan = document.getElementById("imagePreviewName");
+    if (imageInput.files.length > 0) {
+        nameSpan.textContent = "📎 " + imageInput.files[0].name;
+    } else {
+        nameSpan.textContent = "";
+    }
+});
+
+const emojis = ["😊","😂","❤️","👍","😍","🙏","😭","😘","🥰","😎",
+                "🤣","😅","😁","🔥","✅","🎉","💯","😢","😡","🤔",
+                "👏","🥳","😴","🤩","😏","💪","🙌","😬","🫡","👀"];
+
+const emojiPicker = document.getElementById("emojiPicker");
+const emojiBtn = document.getElementById("emojiBtn");
+
+emojis.forEach(emoji => {
+    const span = document.createElement("span");
+    span.textContent = emoji;
+    span.classList.add("emoji-item");
+    span.addEventListener("click", () => {
+        msgInput.value += emoji;
+        emojiPicker.style.display = "none";
+        msgInput.focus();
+    });
+    emojiPicker.appendChild(span);
+});
+
+emojiBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (emojiPicker.style.display === "none") {
+        emojiPicker.style.display = "flex";
+    } else {
+        emojiPicker.style.display = "none";
+    }
+});
+
+document.addEventListener("click", (e) => {
+    if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) {
+        emojiPicker.style.display = "none";
+    }
+});
+
+const chatContainer = document.getElementById("chatContainer");
+
+// Apna status server ko batao
+socket.emit("user-online", currentUser);
+
+// Dusre user ka status receive karo
+
+socket.on("online-users", (users) => {
+    const statusBar = document.getElementById("statusBar");
+    if (users.includes(otherUser)) {
+        statusBar.innerHTML = `🟢 ${otherUser.toUpperCase()} is Online`;
+        statusBar.style.color = "#25d366";
+    } else {
+        statusBar.innerHTML = `⚫ ${otherUser.toUpperCase()} is Offline — checking last seen...`;
+        statusBar.style.color = "#a8d5a2";
+
+        fetch(`/lastSeen/${otherUser}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.lastSeen) {
+                    const time = new Date(data.lastSeen).toLocaleString('en-IN', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        day: '2-digit',
+                        month: 'short'
+                    });
+                    statusBar.innerHTML = `🕐 Last seen ${time}`;
+                }
+            });
+    }
+});
+
+
+
+// Typing indicator - bhejne wala
+const msgInput = document.getElementById("msg");
+let typingTimeout;
+
+msgInput.addEventListener("input", () => {
+    socket.emit("typing", { from: currentUser, to: otherUser });
+
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+        socket.emit("stop-typing", { from: currentUser, to: otherUser });
+    }, 1500);
+});
+
+// Typing indicator - receive karna
+socket.on("user-typing", (data) => {
+    const indicator = document.getElementById("typingIndicator");
+    indicator.textContent = `${data.from} is typing...`;
+});
+
+socket.on("user-stop-typing", () => {
+    const indicator = document.getElementById("typingIndicator");
+    indicator.textContent = "";
+});
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const msg = document.getElementById("msg").value.trim();
+
+    // text message
+    if (msg) {
+        
+
+        socket.emit("send-message", {
+    to: otherUser,
+    msg: msg,
+    replyTo: replyToMsg
+});
+
+
+replyPreviewText.textContent = "";
+replyBar.classList.remove("active");
+
+        document.getElementById("msg").value = "";
+    }
+
+    // image upload
+    if (imageInput.files.length > 0) {
+
+        const formData = new FormData();
+        formData.append("image", imageInput.files[0]);
+
+        await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        imageInput.value = "";
+        document.getElementById("imagePreviewName").textContent = "";
+    }
+});
+
+
+
+
+socket.on("receive-message", (chat) => {
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("message-wrapper");
+    wrapper.classList.add(chat.from === currentUser ? "mine" : "theirs");
+
+    const tick = chat.from === currentUser
+        ? `<span class="tick" id="tick-${chat._id}">✓</span>`
+        : "";
+
+const deleteBtn =
+chat.from === currentUser
+? `
+<form class="delete-form"
+    action="/Chats/${chat._id}"
+    method="POST"
+    style="margin-top:5px;">
+    <button type="submit">🗑️</button>
+</form>
+`
+: "";
+
+
+const replyBlock = chat.replyTo
+    ? `<div class="reply-preview">↩️ ${chat.replyTo.substring(0, 40)}</div>`
+    : "";
+
+const messageContent =
+chat.messageType === "image"
+? `
+<img
+    src="${chat.msg}"
+    class="chat-image"
+    style="max-width:200px;border-radius:10px;cursor:pointer;"
+>
+`
+: `<div>${chat.msg}</div>`;
+
+
+    
+    wrapper.innerHTML = `
+
+
+<div class="message" data-id="${chat._id}">
+
+    <div class="sender">${chat.from}</div>
+    
+
+    ${replyBlock}
+
+    ${messageContent}
+
+    ${deleteBtn}
+    <button class="reply-btn" data-msg="${chat.msg}" data-id="${chat._id}">↩️</button>
+    <button class="copy-btn" data-msg="${chat.msg}">📋</button>
+
+    <div class="timestamp">
+        ${new Date(chat.created_at).toLocaleTimeString('en-IN', {
+            hour:'2-digit',
+            minute:'2-digit'
+        })}
+        ${tick}
+    </div>
+
+</div>
+`;
+
+
+
+    chatContainer.appendChild(wrapper);
+
+    if (chat.from !== currentUser) {
+        const sound = document.getElementById("notifSound");
+        sound.currentTime = 0;
+        sound.play().catch(() => {});
+    }
+    
+    const img = wrapper.querySelector("img");
+
+if (img) {
+    img.onload = () => {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    };
+} else {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    // Agar dusre ka message aaya to seen emit karo
+    if (chat.from !== currentUser) {
+        socket.emit("message-seen", { seenBy: currentUser });
+    }
+});
+
+
+
+// Seen update receive karna
+
+socket.on("update-seen", (data) => {
+
+    if (data.seenBy !== currentUser) {
+        document.querySelectorAll(".tick").forEach((tick) => {
+            tick.textContent = "✓✓";
+            tick.classList.add("seen");
+        });
+    }
+
+});
+
+socket.on("message-deleted", (data) => {
+    console.log("message-deleted received:", data);
+    const wrapper = document.querySelector(
+    `[data-id="${data.id}"]`
+);
+    console.log("wrapper found:", wrapper);
+    if (wrapper) wrapper.remove();
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    socket.emit("message-seen", { seenBy: currentUser });
+
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+});
+
+
+document.addEventListener("submit", async (e) => {
+    if (!e.target.classList.contains("delete-form")) return;
+    e.preventDefault();
+    const form = e.target;
+    const btn = form.querySelector("button");
+    btn.disabled = true;
+    const response = await fetch(form.action, { method: "DELETE" });
+    console.log("Delete response:", response.status);
+});
+
+
+const modal = document.getElementById("imageModal");
+const modalImg = document.getElementById("modalImage");
+const closeModal = document.getElementById("closeModal");
+
+document.addEventListener("click", (e) => {
+
+    
+    if (e.target.classList.contains("chat-image")) {
+    modal.style.display = "flex";
+    modalImg.src = e.target.src;
+    document.getElementById("downloadBtn").href = e.target.src;
+}
+
+
+});
+
+closeModal.addEventListener("click", () => {
+    modal.style.display = "none";
+});
+
+
+modal.addEventListener("click", (e) => {
+
+    if (e.target === modal) {
+        modal.style.display = "none";
+    }
+
+});
+
+
+
+// Reply feature
+
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("copy-btn")) {
+        const msg = e.target.dataset.msg;
+        navigator.clipboard.writeText(msg).then(() => {
+            e.target.textContent = "✅";
+            setTimeout(() => {
+                e.target.textContent = "📋";
+            }, 1500);
+        });
+    }
+});
+
+
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("reply-btn")) {
+        replyToMsg = e.target.dataset.msg;
+        replyToId = e.target.dataset.id;
+        replyPreviewText.textContent = replyToMsg.substring(0, 40);
+        replyBar.classList.add("active");
+        msgInput.focus();
+    }
+});
+
+cancelReply.addEventListener("click", () => {
+    replyToMsg = null;
+    replyToId = null;
+    replyPreviewText.textContent = "";
+    replyBar.classList.remove("active");
+});
+
+
+const darkModeBtn = document.getElementById("darkModeBtn");
+darkModeBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    darkModeBtn.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
+    localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+});
+
+if (localStorage.getItem("darkMode") === "true") {
+    document.body.classList.add("dark-mode");
+    darkModeBtn.textContent = "☀️";
+}
+
+
+
+
+</script>
+
+
+
+    
+</body>
+</html>
