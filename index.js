@@ -444,7 +444,7 @@ app.get("/lastSeen/:username", isLoggedIn, async (req, res) => {
 
 
 app.get("/", (req, res) => {
-    res.send("Root is working!");
+    res.send("/register");
 });
 
 const onlineUsers = new Set();
