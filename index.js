@@ -146,10 +146,7 @@ const User = require("./models/user");
 const bcrypt = require("bcrypt");
 
 
-// require("dotenv").config();
 
-// const express = require("express");
-// const app = express();
 
 
 app.set("views", path.join(__dirname, "views"));
@@ -226,19 +223,6 @@ app.get("/Chats/new", (req, res) => {
 });
 
 //Create Route
-// app.post("/chats", isLoggedIn, async (req, res) => {
-//     try {
-
-//         let { to, msg } = req.body;
-
-// const from = req.session.user;
-//         await Chat.create({ from, to, msg });
-//         res.redirect(`/chat/${req.session.user}`);
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).send("Error saving chat");
-//     }
-// });
 
 app.post("/chats", isLoggedIn, async (req, res) => {
     try {
@@ -399,10 +383,7 @@ app.post("/register", async (req, res) => {
 
         const { username, password } = req.body;
 
-        // const newUser = new User({
-        //     username,
-        //     password
-        // });
+        
 
         if (username !== "raj" && username !== "anshu") {
     return res.send("Only raj and anshu can register");
@@ -410,9 +391,7 @@ app.post("/register", async (req, res) => {
 
         const allowedUsers = ["raj", "anshu"];
 
-// if (!allowedUsers.includes(username.toLowerCase())) {
-//     return res.send("Only Raj and Anshu can register");
-// }
+
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -444,7 +423,7 @@ app.get("/lastSeen/:username", isLoggedIn, async (req, res) => {
 
 
 app.get("/", (req, res) => {
-    res.send("/register");
+    res.redirect("/register");
 });
 
 const onlineUsers = new Set();
