@@ -426,6 +426,12 @@ app.get("/", (req, res) => {
     res.redirect("/register");
 });
 
+
+app.get("/ping", (req, res) => {
+    res.send("pong");
+});
+
+
 const onlineUsers = new Set();
 
 io.on("connection", (socket) => {
