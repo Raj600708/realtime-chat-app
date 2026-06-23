@@ -1,0 +1,182 @@
+body{
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#0f172a,#312e81);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container{
+    width: 350px;
+    padding: 40px;
+
+    display: flex;
+    flex-direction: column;
+
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.3);
+}
+
+.container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.5);
+}
+
+
+h2{
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+input{
+    padding: 15px;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 12px;
+    background: rgba(255,255,255,.15);
+    color: white;
+    font-size: 16px;
+    outline: none;
+    width: 100%;         
+    box-sizing: border-box;
+}
+
+input:focus{
+    border: 1px solid #6366f1;
+}
+
+input::placeholder{
+    color: #ddd;
+}
+
+button{
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(to right,#6366f1,#8b5cf6);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+button:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99,102,241,.5);
+}
+
+
+
+h2{
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+    font-size: 32px;
+    letter-spacing: 1px;
+}
+
+/* animation */
+
+.hearts{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.hearts span{
+    position: absolute;
+    bottom: -50px;
+    font-size: 25px;
+    animation: float 8s linear infinite;
+}
+
+.hearts span:nth-child(1){
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.hearts span:nth-child(2){
+    left: 30%;
+    animation-delay: 2s;
+}
+
+.hearts span:nth-child(3){
+    left: 50%;
+    animation-delay: 4s;
+}
+
+.hearts span:nth-child(4){
+    left: 70%;
+    animation-delay: 1s;
+}
+
+.hearts span:nth-child(5){
+    left: 90%;
+    animation-delay: 3s;
+}
+
+@keyframes float{
+    0%{
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+
+    100%{
+        transform: translateY(-110vh) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* password toggle */
+
+/* Eye toggle */
+
+.eye-field {
+    position: relative;
+    width: 100%;
+}
+.eye-field input {
+    padding-right: 46px;
+    width: 100%;
+    max-width: 100%;
+}
+
+
+.eye-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: var(--muted);
+    transition: color .15s ease;
+    z-index: 10;
+    user-select: none;
+}
+.eye-btn:hover { color: var(--leaf); }
+.eye-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+/* Eye OPEN icon — password visible hai */
+.eye-btn.active svg path {
+    d: path("M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z");
+}

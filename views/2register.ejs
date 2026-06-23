@@ -1,35 +1,87 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <link rel="stylesheet" href="/authcss/2register.css" />
 </head>
 <body>
 
-<h2>Register</h2>
 
-<form action="/register" method="POST">
+<div class="container">
 
-    <input
-        type="text"
-        name="username"
-        placeholder="Username"
-        required
-    >
+    <h2>Welcome! Register Below 👇 ⭐</h2>
 
+    <form action="/register" method="POST">
+
+        <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            required
+        >
+
+        <div class="eye-field">
     <input
         type="password"
         name="password"
+        id="regPass"
         placeholder="Password"
         required
     >
+    <span class="eye-btn" onclick="togglePass('regPass', this)">
+        <svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-5 0-9.27-3.11-11-7.5a10.06 10.06 0 0 1 2.34-3.76M6.53 6.53A9.94 9.94 0 0 1 12 5c5 0 9.27 3.11 11 7.5a10.07 10.07 0 0 1-1.67 2.94M1 1l22 22M9.88 9.88a3 3 0 1 0 4.24 4.24"/></svg>
+    </span>
+</div>
 
-    <button type="submit">
-        Register
-    </button>
+        <button type="submit">
+            Register
+        </button>
 
-</form>
+    </form>
 
-<a href="/login">Login</a>
+    <a href="/login">Already have an account? Log in</a>
+
+</div>
+
+<div class="hearts">
+    <span>❤️</span>
+    <span>😘</span>
+    <span>🥰</span>
+    <span>🤗</span>
+    <span>😍</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+<script>
+    function togglePass(id, btn) {
+    const input = document.getElementById(id);
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+
+    // Icon switch karo
+    if (isHidden) {
+      // Open eye (password visible)
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>';
+        btn.style.color = 'var(--leaf-bright)';
+    } else {
+      // Closed eye (password hidden)
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-5 0-9.27-3.11-11-7.5a10.06 10.06 0 0 1 2.34-3.76M6.53 6.53A9.94 9.94 0 0 1 12 5c5 0 9.27 3.11 11 7.5a10.07 10.07 0 0 1-1.67 2.94M1 1l22 22M9.88 9.88a3 3 0 1 0 4.24 4.24"/></svg>';
+        btn.style.color = 'var(--muted)';
+    }
+}
+</script>
+
+
 
 </body>
 </html>

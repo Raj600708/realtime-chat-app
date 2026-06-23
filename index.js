@@ -106,7 +106,7 @@
 //new code for new  projects........
 
 require("dotenv").config();
-console.log(process.env.MONGO_URI);
+console.log(process.env.MONGO_URL);
 console.log(process.env.SESSION_SECRET);
 console.log(process.env.PORT);
 
@@ -164,7 +164,12 @@ app.use(methodOverride("_method"));
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 24 * 60 * 60 * 1000
+    }
 }));
 
 const server = http.createServer(app);
@@ -178,7 +183,7 @@ main()
 
 async function main() {
     // await mongoose.connect('mongodb://127.0.0.1:27017/whatsapp');
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONGO_URL);
 }
 
 //Index Route
@@ -252,8 +257,13 @@ app.post("/chats", isLoggedIn, async (req, res) => {
 
 app.post("/upload", isLoggedIn, upload.single("image"), async (req, res) => {
     try {
-
         const from = req.session.user;
+        console.log("Upload session user:", from);
+        
+        if (!from) {
+            return res.status(401).send("Not logged in");
+        }
+        
         const to = from === "raj" ? "anshu" : "raj";
 
         const newChat = await Chat.create({
@@ -297,6 +307,7 @@ app.put("/Chats/:id", async (req, res) => {
 
 app.delete("/Chats/:id", isLoggedIn, async (req, res) => {
     console.log("DELETE route hit:", req.params.id);
+    console.log("DELETE session user:", req.session.user);
     let { id } = req.params;
     const chat = await Chat.findById(id);
     if (!chat) return res.status(404).send("Not found");
@@ -407,7 +418,7 @@ const newUser = new User({
     } catch (err) {
 
         console.log(err);
-        res.send("Username already exists");
+        res.send("😅 Looks like this username is already registered.");
 
     }
 
